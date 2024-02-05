@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sendbird_chat_app/component/chat.dart';
 import 'package:sendbird_chat_app/constants/colors.dart';
 import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
+import 'package:intl/intl.dart';
 
 class ChatListScreen extends StatefulWidget {
   final String openChannelUrl;
@@ -18,6 +19,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
   late TextEditingController _messageController;
   late OpenChannel? openChannel;
   List<Map<String, String>> messages = [];
+  late List<BaseMessage> fetchedMessages = [];
+  int timestamp = 0;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +48,29 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
       // print("Open channel Entered: ${openChannel.channelUrl}");
       // print("Open channel name: ${openChannel.name}");
+      final query = PreviousMessageListQuery(
+          channelType: openChannel!.channelType,
+          channelUrl: openChannel!.channelUrl)
+        ..limit = 5
+        ..customTypesFilter = []
+        ..senderIdsFilter = []
+        ..messageTypeFilter = MessageTypeFilter.all;
+      final messageListResults = await query.next();
+      fetchedMessages = messageListResults;
+      for (var message in fetchedMessages) {
+        if (message is UserMessage) {
+          String formattedTime =
+              DateFormat.yMd().add_jms().format(message.createdAt as DateTime);
+
+          addReceivedMessage(
+            message.sender!.nickname ?? 'Unknown',
+            message.message,
+            formattedTime, // You may want to use the actual timestamp from the message
+            message.sender!.profileUrl ?? '',
+          );
+        }
+      }
+
       setState(() {});
     } catch (e) {
       rethrow;
@@ -104,15 +131,19 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(0, 5, 5, 5),
-        title: openChannel != null
-            ? Text(
-                openChannel!.name,
-                style: const TextStyle(color: darkWhite),
-              )
-            : const Text(
-                'Loading...',
-                style: TextStyle(color: darkWhite),
-              ),
+        title: const Text(
+          'Test Channel',
+          style: TextStyle(color: darkWhite),
+        ),
+        // title: openChannel != null
+        //     ? Text(
+        //         openChannel!.name,
+        //         style: const TextStyle(color: darkWhite),
+        //       )
+        //     : const Text(
+        //         'Loading...',
+        //         style: TextStyle(color: darkWhite),
+        //       ),
         leading: IconButton(
           icon: const Icon(CupertinoIcons.back, color: darkWhite),
           onPressed: () {
