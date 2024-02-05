@@ -60,7 +60,6 @@ class ReceiverMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData size = MediaQuery.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

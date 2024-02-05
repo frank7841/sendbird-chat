@@ -16,7 +16,7 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   late TextEditingController _messageController;
-  late OpenChannel openChannel;
+  late OpenChannel? openChannel;
   List<Map<String, String>> messages = [];
   @override
   void initState() {
@@ -42,8 +42,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
     try {
       openChannel = await OpenChannel.getChannel(widget.openChannelUrl);
 
-      print("Open channel Entered: ${openChannel.channelUrl}");
-      print("Open channel name: ${openChannel.name}");
+      // print("Open channel Entered: ${openChannel.channelUrl}");
+      // print("Open channel name: ${openChannel.name}");
       setState(() {});
     } catch (e) {
       rethrow;
@@ -77,17 +77,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ..data = 'DATA'
         ..customType = 'CUSTOM_TYPE';
 
-      openChannel.sendUserMessage(params, handler: (message, e) {
+      openChannel?.sendUserMessage(params, handler: (message, e) {
         if (e != null) {
           // Handle error.
-          print('Error sending message: $e');
+          // print('Error sending message: $e');
         } else {
           // Handle successful message sending.
-          print('Message sent successfully: $messageText');
+          // print('Message sent successfully: $messageText');
           setState(() {
-            print('Before: $messageText');
+            // print('Before: $messageText');
             addSentMessage(messageText);
-            print('After: $messages');
+            // print('After: $messages');
           });
         }
       });
@@ -95,7 +95,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       _messageController.clear();
     } catch (e) {
       // Handle error.
-      print('Error sending message: $e');
+      // print('Error sending message: $e');
     }
   }
 
@@ -106,8 +106,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
         backgroundColor: const Color.fromARGB(0, 5, 5, 5),
         title: openChannel != null
             ? Text(
-                openChannel.name,
-                style: TextStyle(color: darkWhite),
+                openChannel!.name,
+                style: const TextStyle(color: darkWhite),
               )
             : const Text(
                 'Loading...',
@@ -176,8 +176,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           Expanded(
                             child: TextField(
                               controller: _messageController,
+                              cursorColor: darkWhite,
+                              style: const TextStyle(color: darkWhite),
                               decoration: const InputDecoration(
-                                hintText: 'Send a message...',
+                                fillColor: Color.fromARGB(179, 247, 242, 242),
+                                hintStyle: TextStyle(color: darkWhite),
+                                hintText: '안녕하세요...',
                                 border: InputBorder.none,
                               ),
                             ),
@@ -185,7 +189,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           IconButton(
                             icon: const Icon(
                               CupertinoIcons.arrow_up_circle,
-                              color: darkWhite,
+                              color: Color.fromARGB(255, 214, 63, 113),
                             ),
                             onPressed: () {
                               sendMessage();
